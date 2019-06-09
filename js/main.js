@@ -1,7 +1,7 @@
 var canvas = document.querySelector('canvas');
 
-canvas.width = 600;//window.innerWidth;
-canvas.height = 450;//window.innerHeight;
+canvas.width = 600; //window.innerWidth;
+canvas.height = 450; //window.innerHeight;
 
 var context = canvas.getContext("2d");
 var saveMe = null;
@@ -28,44 +28,43 @@ function Circle(x, y, dx, dy, radius, who) {
 
   this.update = function() {
 
-      // if 'saveMe' hits left or right border, it should gameover;
-      // while as other circles should rebound
-      if(this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+    // if 'saveMe' hits left or right border, it should gameover;
+    // while as other circles should rebound
+    if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
 
-        if(this.who == 'saveMe') {
-          gameOver();
-        } else {
-          this.dx = -this.dx;
-        }
+      if (this.who == 'saveMe') {
+        gameOver();
+      } else {
+        this.dx = -this.dx;
       }
+    }
 
-      // if 'saveMe' hits top or bottom border, it should gameover;
-      // while as other circles should rebound
-      if(this.y + this.radius > canvas.height || this.y - this.radius < 0) {
+    // if 'saveMe' hits top or bottom border, it should gameover;
+    // while as other circles should rebound
+    if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
 
-        if(this.who == 'saveMe') {
-          gameOver();
-        } else {
-          this.dy = -this.dy;
-        }
+      if (this.who == 'saveMe') {
+        gameOver();
+      } else {
+        this.dy = -this.dy;
       }
+    }
 
-      this.x += this.dx;
-      this.y += this.dy;
-      this.draw();
-      this.collusion();
+    this.x += this.dx;
+    this.y += this.dy;
+    this.draw();
+    this.collusion();
   }
 
-  this.collusion = function () {
+  this.collusion = function() {
 
     //detect collusion of 'saveMe' circle with all other obstacle circles
-    if(this.who != 'saveMe')
-    {
+    if (this.who != 'saveMe') {
       //get distance between 'saveMe' circle and this
       var distance = getDistance(saveMe, this);
 
       //if disctance is less than the sum of two radii, then it is a collusion
-      if(distance < ( saveMe.radius + this.radius)) {
+      if (distance < (saveMe.radius + this.radius)) {
         gameOver();
       }
     }
@@ -76,7 +75,7 @@ function Circle(x, y, dx, dy, radius, who) {
 var points = 0;
 var saveMeDx = 2;
 var saveMeDy = 2;
-saveMe = new Circle(200,200,2,2,20,'saveMe');
+saveMe = new Circle(200, 200, 2, 2, 20, 'saveMe');
 var obstacleCircles = []; //to store obstacle circles
 
 //add obstacle circle after every 5 seconds
@@ -85,13 +84,13 @@ var scoreTimer = setInterval(updateScore, 250);
 
 function animate() {
 
-  if(!isGameOver) {
+  if (!isGameOver) {
     requestAnimationFrame(animate);
   }
   context.clearRect(0, 0, canvas.width, canvas.height);
   saveMe.update();
 
-  for(looper = 0;looper < obstacleCircles.length; looper++) {
+  for (looper = 0; looper < obstacleCircles.length; looper++) {
     obstacleCircles[looper].update();
   }
 
@@ -100,11 +99,11 @@ function animate() {
 function addObstacleCircle() {
 
   //limit obstacle circles
-  if(obstacleCircles.length == 10) {
+  if (obstacleCircles.length == 10) {
     obstacleCircles = [];
   }
 
-  var obstacle = new Circle(20,20,2,2,20,'obstacle');
+  var obstacle = new Circle(20, 20, 2, 2, 20, 'obstacle');
   obstacleCircles.push(obstacle);
 }
 
@@ -131,43 +130,43 @@ function updateScore() {
 function getDistance(circle1, circle2) {
 
 
-    circle1Center = [circle1.x + circle1.radius, circle1.y + circle1.radius];
-    circle2Center = [circle2.x + circle2.radius, circle2.y + circle2.radius];
+  circle1Center = [circle1.x + circle1.radius, circle1.y + circle1.radius];
+  circle2Center = [circle2.x + circle2.radius, circle2.y + circle2.radius];
 
-    var distance = Math.sqrt( Math.pow( circle2Center[0] - circle1Center[0], 2) +
-                   Math.pow( circle2Center[1] - circle1Center[1], 2));
+  var distance = Math.sqrt(Math.pow(circle2Center[0] - circle1Center[0], 2) +
+    Math.pow(circle2Center[1] - circle1Center[1], 2));
 
-    return distance;
+  return distance;
 }
 
 // arrow key detection for navigation
 document.onkeydown = function(e) {
-    switch (e.keyCode) {
+  switch (e.keyCode) {
 
-        case 37: //left
+    case 37: //left
 
-            saveMe.dy = 0;
-            saveMe.dx = -saveMeDx;
-            break;
+      saveMe.dy = 0;
+      saveMe.dx = -saveMeDx;
+      break;
 
-        case 38: //up
+    case 38: //up
 
-            saveMe.dx = 0;
-            saveMe.dy = -saveMeDy;
-            break;
+      saveMe.dx = 0;
+      saveMe.dy = -saveMeDy;
+      break;
 
-        case 39: //right
+    case 39: //right
 
-            saveMe.dy = 0;
-            saveMe.dx = saveMeDx;
-            break;
+      saveMe.dy = 0;
+      saveMe.dx = saveMeDx;
+      break;
 
-        case 40: //down
+    case 40: //down
 
-            saveMe.dx = 0;
-            saveMe.dy = saveMeDy;
-            break;
-    }
+      saveMe.dx = 0;
+      saveMe.dy = saveMeDy;
+      break;
+  }
 };
 
 animate();
