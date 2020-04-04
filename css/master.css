@@ -1,9 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&display=swap');
 body {
-  margin: 0;
+  margin: 0 !important;
+  padding: 0 !important;
+  overscroll-behavior: contain;
+  /*font-family: 'Dancing Script', cursive;*/
+  font-family: 'Lato', sans-serif;
+  text-align: center;
+}
+
+.container {
+    max-width: 600px;
+    display: inline-block;
+}
+
+p {
+    text-align: justify;
+    text-justify: inter-word;
+    padding: 14px;
+}
+
+label {
+  font-size: 100%;    
 }
 
 canvas {
   margin-top: 10px;
-  border: 5px solid red;
+  border: 1px solid red;
   /*background: red; */
 }
+

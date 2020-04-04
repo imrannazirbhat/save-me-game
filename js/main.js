@@ -1,11 +1,33 @@
 var canvas = document.querySelector('canvas');
 
-canvas.width = 600; //window.innerWidth;
-canvas.height = 450; //window.innerHeight;
+canvas.width = window.innerWidth * .95;
+
+if(window.innerWidth < window.innerHeight) {
+  canvas.height = window.innerHeight * .92;
+} else {
+  canvas.height = window.innerHeight * .80;
+}
 
 var context = canvas.getContext("2d");
 var saveMe = null;
+var hasGameStarted = false;
 var isGameOver = false;
+var radius_ = 10;
+var points = 0;
+var saveMeDx = 4;
+var saveMeDy = 4;
+var obstacleCircles = []; //to store obstacle circles
+//add obstacle circle after every 5 seconds
+var addObstacleTimer = null;//setInterval(addObstacleCircle, 5000);
+var maxObstaclePeak = 5;
+var maxObstaclePeakTouched = false;
+var isWin = false;
+var score = 0;
+//var scoreTimer = null;//setInterval(updateScore, 250);
+
+window.addEventListener("orientationchange", function() {
+  location.reload(true);
+}, false);
 
 function Circle(x, y, dx, dy, radius, who) {
 
@@ -72,16 +94,6 @@ function Circle(x, y, dx, dy, radius, who) {
 
 }
 
-var points = 0;
-var saveMeDx = 2;
-var saveMeDy = 2;
-saveMe = new Circle(200, 200, 2, 2, 20, 'saveMe');
-var obstacleCircles = []; //to store obstacle circles
-
-//add obstacle circle after every 5 seconds
-var addObstacleTimer = setInterval(addObstacleCircle, 5000);
-var scoreTimer = setInterval(updateScore, 250);
-
 function animate() {
 
   if (!isGameOver) {
@@ -98,31 +110,46 @@ function animate() {
 
 function addObstacleCircle() {
 
-  //limit obstacle circles
-  if (obstacleCircles.length == 10) {
-    obstacleCircles = [];
+  ++score;
+  document.getElementById('score').innerHTML = "Survival: " + Math.floor((score / (maxObstaclePeak*2)) * 100) + "% | <a href='#' onclick='startGame()'>Start Again</a>";
+  
+  if(maxObstaclePeak === obstacleCircles.length && !maxObstaclePeakTouched) {
+    maxObstaclePeakTouched = true;
   }
 
-  var obstacle = new Circle(20, 20, 2, 2, 20, 'obstacle');
-  obstacleCircles.push(obstacle);
+  if(!maxObstaclePeakTouched) {
+    // Get random x between radius_ and canvas width
+    var x = Math.floor(Math.random() * (canvas.width - radius_)) + radius_;
+    var obstacle = new Circle(x, radius_, 2, 2, radius_, 'obstacle');
+    obstacleCircles.push(obstacle);
+  } else {
+    obstacleCircles.pop();
+    didWon();
+  }
+}
+
+function didWon() {
+
+  if(obstacleCircles.length === 0 && maxObstaclePeakTouched) {
+    isWin = true;
+    gameOver();
+  }
+
 }
 
 function gameOver() {
 
   isGameOver = true;
-  clearInterval(scoreTimer);
-  //alert("Game Over! You scored " + --points + " points.");
-  document.getElementById('score').innerHTML = "Game Over! You scored " + --points + " points. <a href='index.html'>Start Again</a>";
-  //points = 0;
-  //saveMe.x = 200;
-  //saveMe.y = 200;
-  //obstacleCircles = [];
-}
+  //clearInterval(scoreTimer);
+  if(addObstacleTimer) {
+    clearInterval(addObstacleTimer);
+  }
 
-function updateScore() {
-
-  document.getElementById('score').innerHTML = "Score: " + points;
-  points++;
+  if(isWin) {
+    document.getElementById('score').innerHTML = "Congratulations!! You Survived.";
+  } else {
+    document.getElementById('score').innerHTML = ((obstacleCircles.length > 0) ? ("You survived " + Math.floor((score / (maxObstaclePeak*2)) * 100) + "%.") : "You could not even survive alone.") + " <a href='#' onclick='startGame()'>Start Again</a>";
+  }
 }
 
 //funciton to get distance bewtween two obstacleCircles
@@ -169,4 +196,38 @@ document.onkeydown = function(e) {
   }
 };
 
-animate();
+// Funciton to control navigation using arrow panel
+function navigate(code) {
+  document.dispatchEvent(new KeyboardEvent('keydown',{'keyCode':code}));
+}
+
+function startGame() {
+
+  isGameOver = false;
+  score = 0;
+  obstacleCircles = [];
+  saveMe = new Circle(radius_, radius_, saveMeDx, saveMeDy, radius_, 'saveMe');
+  //alert(canvas.width);
+  if(addObstacleTimer) {
+    clearInterval(addObstacleTimer);
+  }
+  addObstacleTimer = setInterval(addObstacleCircle, 5000);
+  document.getElementById('score').innerHTML = "Survival: 0%";
+  /*
+  if(scoreTimer) {
+    clearInterval(scoreTimer);
+  }
+  scoreTimer = setInterval(updateScore, 250);
+  */
+  animate();
+  //hasGameStarted = true;
+}
+
+var swiper = new Swipe(document.getElementById('canvas'));
+swiper.onLeft(function() { document.dispatchEvent(new KeyboardEvent('keydown',{'keyCode':37})); });
+swiper.onUp(function() { document.dispatchEvent(new KeyboardEvent('keydown',{'keyCode':38})); });
+swiper.onRight(function() { document.dispatchEvent(new KeyboardEvent('keydown',{'keyCode':39})); });
+swiper.onDown(function() { document.dispatchEvent(new KeyboardEvent('keydown',{'keyCode':40})); });
+swiper.run();
+
+startGame();
